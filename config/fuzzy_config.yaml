@@ -1,0 +1,65 @@
+# Fuzzy Control Configuration
+vehicle:
+  max_speed: 80
+  min_speed: 0
+  max_steering: 30
+  min_steering: -30
+
+safety:
+  danger_distance: 15
+  safe_distance: 50
+  max_safe_speed: 60
+
+fuzzy_sets:
+  distance:
+    very_close: [0, 0, 5, 15]
+    close: [5, 15, 30]
+    medium: [15, 35, 55]
+    far: [40, 70, 100, 100]
+  
+  speed:
+    slow: [0, 0, 40]
+    medium: [20, 50, 80]
+    fast: [50, 80, 100]
+  
+  steering:
+    hard_left: [-30, -30, -20, -10]
+    left: [-20, -10, -2]
+    straight: [-5, 0, 5]
+    right: [2, 10, 20]
+    hard_right: [10, 20, 30, 30]
+  
+  traffic:
+    low: [0, 0, 0.4]
+    moderate: [0.2, 0.5, 0.8]
+    high: [0.6, 1, 1]
+  
+  curvature:
+    straight: [0, 0, 0.3]
+    moderate_curve: [0.2, 0.5, 0.8]
+    sharp_curve: [0.6, 1, 1]
+
+rules:
+  speed_control:
+    - condition: [distance=very_close, traffic=high]
+      output: [brake]
+    - condition: [distance=close, curvature=sharp_curve]
+      output: [slow]
+    - condition: [distance=medium, traffic=low]
+      output: [medium]
+    - condition: [distance=far, curvature=straight]
+      output: [fast]
+  
+  steering_control:
+    - condition: [steering=hard_left]
+      output: [hard_left]
+    - condition: [steering=left]
+      output: [left]
+    - condition: [steering=straight]
+      output: [straight]
+    - condition: [steering=right]
+      output: [right]
+    - condition: [steering=hard_right]
+      output: [hard_right]
+    - condition: [curvature=sharp_curve]
+      output: [left, slow]
